@@ -1,0 +1,8 @@
+# this is redis config file
+[list]
+    [list.default]
+        proxy_list = ["120.25.255.207:6380"]
+        max_active = 100
+        max_idle = 100
+        down_grade = false
+        password = "chx200205173214"
