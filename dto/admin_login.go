@@ -14,3 +14,7 @@ func (param *AdminLoginInput) BindValidParam(c *gin.Context) error {
 	err := public.DefaultGetValidParams(c, param)
 	return err
 }
+
+type AdminLoginOutput struct {
+	Token string `json:"token"`
+}

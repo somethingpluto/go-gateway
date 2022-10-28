@@ -1,50 +1,47 @@
 definitions:
-  dto.DemoInput:
+  dto.AdminLoginInput:
     properties:
-      age:
-        example: 20
-        type: integer
-      name:
-        example: 姓名
-        type: string
-      passwd:
+      password:
         example: "123456"
         type: string
+      username:
+        example: admin
+        type: string
     required:
-    - age
-    - name
-    - passwd
+    - password
+    - username
+    type: object
+  dto.AdminLoginOutput:
+    properties:
+      token:
+        type: string
     type: object
   middleware.Response:
     properties:
-      data:
-        type: object
+      data: {}
       errmsg:
         type: string
       errno:
         type: integer
-      stack:
-        type: object
-      trace_id:
-        type: object
+      stack: {}
+      trace_id: {}
     type: object
 info:
   contact: {}
-  license: {}
 paths:
-  /demo/bind:
+  /admin_login/login:
     post:
       consumes:
       - application/json
-      description: 测试数据绑定
-      operationId: /demo/bind
+      description: 管理员登陆
+      operationId: /admin_login/login
       parameters:
       - description: body
         in: body
-        name: polygon
+        name: body
         required: true
         schema:
-          $ref: '#/definitions/dto.DemoInput'
+          $ref: '#/definitions/dto.AdminLoginInput'
       produces:
       - application/json
       responses:
@@ -55,9 +52,9 @@ paths:
             - $ref: '#/definitions/middleware.Response'
             - properties:
                 data:
-                  $ref: '#/definitions/dto.DemoInput'
+                  $ref: '#/definitions/dto.AdminLoginOutput'
               type: object
-      summary: 测试数据绑定
+      summary: 管理员登陆
       tags:
-      - 用户
+      - 管理员接口
 swagger: "2.0"

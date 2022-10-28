@@ -1,13 +1,12 @@
 {
     "swagger": "2.0",
     "info": {
-        "contact": {},
-        "license": {}
+        "contact": {}
     },
     "paths": {
-        "/demo/bind": {
+        "/admin_login/login": {
             "post": {
-                "description": "测试数据绑定",
+                "description": "管理员登陆",
                 "consumes": [
                     "application/json"
                 ],
@@ -15,18 +14,18 @@
                     "application/json"
                 ],
                 "tags": [
-                    "用户"
+                    "管理员接口"
                 ],
-                "summary": "测试数据绑定",
-                "operationId": "/demo/bind",
+                "summary": "管理员登陆",
+                "operationId": "/admin_login/login",
                 "parameters": [
                     {
                         "description": "body",
-                        "name": "polygon",
+                        "name": "body",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/dto.DemoInput"
+                            "$ref": "#/definitions/dto.AdminLoginInput"
                         }
                     }
                 ],
@@ -42,7 +41,7 @@
                                     "type": "object",
                                     "properties": {
                                         "data": {
-                                            "$ref": "#/definitions/dto.DemoInput"
+                                            "$ref": "#/definitions/dto.AdminLoginOutput"
                                         }
                                     }
                                 }
@@ -54,46 +53,43 @@
         }
     },
     "definitions": {
-        "dto.DemoInput": {
+        "dto.AdminLoginInput": {
             "type": "object",
             "required": [
-                "age",
-                "name",
-                "passwd"
+                "password",
+                "username"
             ],
             "properties": {
-                "age": {
-                    "type": "integer",
-                    "example": 20
-                },
-                "name": {
-                    "type": "string",
-                    "example": "姓名"
-                },
-                "passwd": {
+                "password": {
                     "type": "string",
                     "example": "123456"
+                },
+                "username": {
+                    "type": "string",
+                    "example": "admin"
+                }
+            }
+        },
+        "dto.AdminLoginOutput": {
+            "type": "object",
+            "properties": {
+                "token": {
+                    "type": "string"
                 }
             }
         },
         "middleware.Response": {
             "type": "object",
             "properties": {
-                "data": {
-                    "type": "object"
-                },
+                "data": {},
                 "errmsg": {
                     "type": "string"
                 },
                 "errno": {
                     "type": "integer"
                 },
-                "stack": {
-                    "type": "object"
-                },
-                "trace_id": {
-                    "type": "object"
-                }
+                "stack": {},
+                "trace_id": {}
             }
         }
     }
