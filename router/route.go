@@ -70,7 +70,5 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 		})
 	})
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-
-	adminLoginRouter := router.Group("/admin_login")
 	return router
 }
