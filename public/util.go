@@ -5,6 +5,12 @@ import (
 	"fmt"
 )
 
+// GenSaltPassword
+// @Description: 密码加密
+// @param salt 盐
+// @param password 密码
+// @return string 加密后的密码字符串
+//
 func GenSaltPassword(salt string, password string) string {
 	s1 := sha256.New()
 	s1.Write([]byte(password))
