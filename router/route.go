@@ -72,5 +72,6 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 	router.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	InitAdminLoginRouter(router)
+	InitAdminRouter(router)
 	return router
 }

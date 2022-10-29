@@ -1,9 +1,15 @@
 package controller
 
 import (
+	"encoding/json"
 	"github.com/e421083458/gin_scaffold/middleware"
+	"github.com/e421083458/golang_common/lib"
+	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"go_gateway/dao"
 	"go_gateway/dto"
+	"go_gateway/public"
+	"time"
 )
 
 type AdminLoginController struct{}
@@ -11,6 +17,7 @@ type AdminLoginController struct{}
 func AdminLoginRegister(group *gin.RouterGroup) {
 	adminLogin := &AdminLoginController{}
 	group.POST("/login", adminLogin.AdminLogin)
+	group.GET("/logout", adminLogin.AdminLoginOut)
 }
 
 // AdminLogin godoc
@@ -24,7 +31,9 @@ func AdminLoginRegister(group *gin.RouterGroup) {
 // @Success 200 {object} middleware.Response{data=dto.AdminLoginOutput} "success"
 // @Router /admin_login/login [post]
 func (adminLogin *AdminLoginController) AdminLogin(c *gin.Context) {
+	// 获取用户输入
 	param := &dto.AdminLoginInput{}
+	// 用户输入验证
 	err := param.BindValidParam(c)
 	if err != nil {
 		middleware.ResponseError(c, 1001, err)
@@ -34,6 +43,42 @@ func (adminLogin *AdminLoginController) AdminLogin(c *gin.Context) {
 	//userName := param.UserName
 	//password := param.Password
 	// 2. salt + password sha256加密 =>saltPassword
-	out := &dto.AdminLoginOutput{Token: "token"}
+	// 获取db
+	tx, err := lib.GetGormPool("default")
+	if err != nil {
+		middleware.ResponseError(c, 2001, err)
+		return
+	}
+
+	admin := &dao.Admin{}
+	// 检查用户密码是否正确
+	admin, err = admin.LoginCheck(c, tx, param)
+	if err != nil {
+		middleware.ResponseError(c, 2002, err)
+		return
+	}
+	// 设置session
+
+	sessionInfo := &dto.AdminSessionInfo{
+		ID:        admin.Id,
+		UserName:  admin.UserName,
+		LoginTime: time.Now(),
+	}
+	sessionInfoBytes, err := json.Marshal(sessionInfo)
+	if err != nil {
+		middleware.ResponseError(c, 2003, err)
+		return
+	}
+	session := sessions.Default(c)
+	session.Set(public.AdminSessionInfoKey, string(sessionInfoBytes))
+	session.Save()
+	out := &dto.AdminLoginOutput{Token: admin.UserName}
 	middleware.ResponseSuccess(c, out)
+}
+
+func (adminLogin *AdminLoginController) AdminLoginOut(c *gin.Context) {
+	session := sessions.Default(c)
+	session.Delete(public.AdminSessionInfoKey)
+	session.Save()
+	middleware.ResponseSuccess(c, "退出登录")
 }
