@@ -13,3 +13,7 @@
 ​	🍟 [3.反向代理](https://www.yuque.com/docs/share/79dacfdf-1d22-4d1a-93cd-2bee9fad5832?# 《03.反向代理》)
 
 ​     🍿 [4.ReverseProxy使用](https://www.yuque.com/docs/share/feb01a88-39d2-45eb-9cda-0e5fa869ef8c?# 《04.ReverseProxy使用——修改response》)
+
+​	 🧂 [5.负载均衡—随机负载均衡](https://www.yuque.com/docs/share/b548632f-414c-4b69-85ea-d860f8f9b38b?# 《05.负载均衡—随机负载均衡》)
+
+​	🥓 [6.负载均衡—轮询负载均衡](https://www.yuque.com/docs/share/128a9f35-1ff5-456a-b8fc-2a162039a314?# 《06.负载均衡—轮询负载均衡》)

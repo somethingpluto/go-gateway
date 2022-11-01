@@ -16,4 +16,17 @@ func (param *ServiceListInput) BindValidParam(c *gin.Context) error {
 }
 
 type ServiceListOutput struct {
+	Total string                   `json:"total" form:"total" comment:"总数" example:"" validate:""`
+	List  []*ServiceListItemOutput `json:"list" form:"list" comment:"列表" `
+}
+
+type ServiceListItemOutput struct {
+	ID          int64  `json:"id" form:"id"`
+	ServiceName string `json:"service_name" form:"service_name"`
+	ServiceDesc string `json:"service_desc" form:"service_desc"`
+	LoadType    int    `json:"load_type" form:"load_type"`
+	ServiceAddr string `json:"service_addr" from:"service_addr"`
+	Qps         int64  `json:"qps" form:"qps"`
+	Qpd         int64  `json:"qpd" form:"qpd"`
+	TotalNode   int    `json:"total_node" form:"total_node"`
 }

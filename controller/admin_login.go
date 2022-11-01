@@ -2,12 +2,12 @@ package controller
 
 import (
 	"encoding/json"
-	"github.com/e421083458/gin_scaffold/middleware"
-	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
+	"go_gateway/common/lib"
 	"go_gateway/dao"
 	"go_gateway/dto"
+	"go_gateway/middleware"
 	"go_gateway/public"
 	"time"
 )
