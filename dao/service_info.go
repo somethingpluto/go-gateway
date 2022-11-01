@@ -3,6 +3,7 @@ package dao
 import (
 	"github.com/e421083458/gorm"
 	"github.com/gin-gonic/gin"
+	"go_gateway/dto"
 	"go_gateway/public"
 	"time"
 )
@@ -19,6 +20,24 @@ type ServiceInfo struct {
 
 func (t *ServiceInfo) TableName() string {
 	return "gateway_service_info"
+}
+
+func (t *ServiceInfo) PageList(c *gin.Context, tx *gorm.DB, param *dto.ServiceListInput) ([]ServiceInfo, int64, error) {
+	total := int64(0)
+	var list []ServiceInfo
+	offset := (param.PageNo - 1) * param.PageSize
+
+	query := tx.SetCtx(public.GetGinTraceContext(c))
+	query.Table(t.TableName()).Where("id_delete = 0")
+	if param.Info != "" {
+		query = query.Where("(service_name like %?% or service_desc like %?%)", param.Info, param.Info)
+	}
+	err := query.Limit(param.PageSize).Offset(offset).Find(&list).Error
+	if err != gorm.ErrRecordNotFound && err != nil {
+		return nil, 0, err
+	}
+	query.Limit(param.PageSize).Offset(offset).Count(&total)
+	return list, total, nil
 }
 
 func (t *ServiceInfo) Find(c *gin.Context, tx *gorm.DB, search *ServiceInfo) (*ServiceInfo, error) {

@@ -1,7 +1,7 @@
 package main
 
 import (
-	"github.com/e421083458/golang_common/lib"
+	"go_gateway/common/lib"
 	"go_gateway/initialize"
 	"go_gateway/router"
 	"os"
@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	lib.InitModule("./conf/dev/", []string{"base", "mysql", "redis"})
+	lib.InitModule("./conf/dev/")
 	defer lib.Destroy()
 	initialize.Init()
 	router.HttpServerRun()

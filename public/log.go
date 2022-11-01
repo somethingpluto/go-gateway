@@ -2,15 +2,16 @@ package public
 
 import (
 	"context"
-	"github.com/e421083458/golang_common/lib"
+	"go_gateway/common/lib"
+
 	"github.com/gin-gonic/gin"
 )
 
 //错误日志
 func ContextWarning(c context.Context, dltag string, m map[string]interface{}) {
-	v:=c.Value("trace")
-	traceContext,ok := v.(*lib.TraceContext)
-	if !ok{
+	v := c.Value("trace")
+	traceContext, ok := v.(*lib.TraceContext)
+	if !ok {
 		traceContext = lib.NewTrace()
 	}
 	lib.Log.TagWarn(traceContext, dltag, m)
@@ -18,9 +19,9 @@ func ContextWarning(c context.Context, dltag string, m map[string]interface{}) {
 
 //错误日志
 func ContextError(c context.Context, dltag string, m map[string]interface{}) {
-	v:=c.Value("trace")
-	traceContext,ok := v.(*lib.TraceContext)
-	if !ok{
+	v := c.Value("trace")
+	traceContext, ok := v.(*lib.TraceContext)
+	if !ok {
 		traceContext = lib.NewTrace()
 	}
 	lib.Log.TagError(traceContext, dltag, m)
@@ -28,9 +29,9 @@ func ContextError(c context.Context, dltag string, m map[string]interface{}) {
 
 //普通日志
 func ContextNotice(c context.Context, dltag string, m map[string]interface{}) {
-	v:=c.Value("trace")
-	traceContext,ok := v.(*lib.TraceContext)
-	if !ok{
+	v := c.Value("trace")
+	traceContext, ok := v.(*lib.TraceContext)
+	if !ok {
 		traceContext = lib.NewTrace()
 	}
 	lib.Log.TagInfo(traceContext, dltag, m)
@@ -68,7 +69,7 @@ func GetTraceContext(c context.Context) *lib.TraceContext {
 	if c == nil {
 		return lib.NewTrace()
 	}
-	traceContext:=c.Value("trace")
+	traceContext := c.Value("trace")
 	if tc, ok := traceContext.(*lib.TraceContext); ok {
 		return tc
 	}

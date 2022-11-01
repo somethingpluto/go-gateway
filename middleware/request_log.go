@@ -2,8 +2,8 @@ package middleware
 
 import (
 	"bytes"
-	"github.com/e421083458/golang_common/lib"
 	"github.com/gin-gonic/gin"
+	"go_gateway/common/lib"
 	"go_gateway/public"
 	"io/ioutil"
 	"time"
