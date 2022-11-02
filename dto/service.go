@@ -6,7 +6,7 @@ import (
 )
 
 type ServiceListInput struct {
-	Info     string `json:"info" form:"form" comment:"关键词" example:"http" validate:""`
+	Info     string `json:"info" form:"info" comment:"关键词" example:"http" validate:""`
 	PageNo   int    `json:"page_no" form:"page_no" comment:"页数" example:"1" validate:"required"`
 	PageSize int    `json:"page_size" form:"page_size" comment:"每页条数" example:"10" validate:"required"`
 }
@@ -16,7 +16,7 @@ func (param *ServiceListInput) BindValidParam(c *gin.Context) error {
 }
 
 type ServiceListOutput struct {
-	Total string                   `json:"total" form:"total" comment:"总数" example:"" validate:""`
+	Total int                      `json:"total" form:"total" comment:"总数" example:"" validate:""`
 	List  []*ServiceListItemOutput `json:"list" form:"list" comment:"列表" `
 }
 
