@@ -1,9 +1,10 @@
 package dao
 
 import (
+	"go_gateway/public"
+
 	"github.com/e421083458/gorm"
 	"github.com/gin-gonic/gin"
-	"go_gateway/public"
 )
 
 type TcpRule struct {

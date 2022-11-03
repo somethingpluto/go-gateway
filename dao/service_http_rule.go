@@ -6,6 +6,9 @@ import (
 	"go_gateway/public"
 )
 
+// HttpRule
+// @Description: gateway_service_http_rule 表实体结构体
+//
 type HttpRule struct {
 	ID             int64  `json:"id" gorm:"primary_key"`
 	ServiceID      int64  `json:"service_id" gorm:"column:service_id" description:"服务id"`

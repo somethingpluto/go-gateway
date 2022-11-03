@@ -1,11 +1,15 @@
 package dao
 
 import (
+	"go_gateway/public"
+
 	"github.com/e421083458/gorm"
 	"github.com/gin-gonic/gin"
-	"go_gateway/public"
 )
 
+// GrpcRule
+// @Description: gateway_service_grpc_rule 表实体结构体
+//
 type GrpcRule struct {
 	ID             int64  `json:"id" gorm:"primary_key"`
 	ServiceID      int64  `json:"service_id" gorm:"column:service_id" description:"服务id	"`
@@ -17,6 +21,15 @@ func (t *GrpcRule) TableName() string {
 	return "gateway_service_grpc_rule"
 }
 
+// Find
+// @Description: 根据条件查找GrpcRule
+// @receiver t
+// @param c
+// @param tx
+// @param search
+// @return *GrpcRule
+// @return error
+//
 func (t *GrpcRule) Find(c *gin.Context, tx *gorm.DB, search *GrpcRule) (*GrpcRule, error) {
 	model := &GrpcRule{}
 	err := tx.SetCtx(public.GetGinTraceContext(c)).Where(search).Find(&model).Error

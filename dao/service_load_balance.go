@@ -1,10 +1,11 @@
 package dao
 
 import (
-	"github.com/e421083458/gorm"
-	"github.com/gin-gonic/gin"
 	"go_gateway/public"
 	"strings"
+
+	"github.com/e421083458/gorm"
+	"github.com/gin-gonic/gin"
 )
 
 type LoadBalance struct {
@@ -31,6 +32,7 @@ func (t *LoadBalance) TableName() string {
 func (t *LoadBalance) Find(c *gin.Context, tx *gorm.DB, search *LoadBalance) (*LoadBalance, error) {
 	model := &LoadBalance{}
 	err := tx.SetCtx(public.GetGinTraceContext(c)).Where(search).Find(&model).Error
+
 	return model, err
 }
 
