@@ -13,9 +13,10 @@ import (
 
 type ServiceController struct{}
 
-func ServiceRegister(router *gin.RouterGroup) {
+func ServiceRegister(group *gin.RouterGroup) {
 	service := &ServiceController{}
-	router.GET("/service_list", service.ServiceList)
+	group.GET("/service_list", service.ServiceList)
+	group.POST("/service_delete", service.ServiceDelete)
 }
 
 func (service *ServiceController) ServiceList(c *gin.Context) {
@@ -69,14 +70,48 @@ func (service *ServiceController) ServiceList(c *gin.Context) {
 		if serviceDetail.Info.LoadType == public.LoadTypeGRPC {
 			serviceAddr = fmt.Sprintf("%s:%d", clusterIP, serviceDetail.GRPCRule.Port)
 		}
+		ipList := serviceDetail.LoadBalance.GetIPListByModel()
 		temp := &dto.ServiceListItemOutput{
 			ID:          item.ID,
 			ServiceName: item.ServiceName,
 			ServiceDesc: item.ServiceDesc,
 			LoadType:    item.LoadType,
 			ServiceAddr: serviceAddr,
+			Qpd:         0,
+			Qps:         0,
+			TotalNode:   len(ipList),
 		}
 		out.List = append(out.List, temp)
 	}
 	middleware.ResponseSuccess(c, out)
+}
+
+func (service *ServiceController) ServiceDelete(c *gin.Context) {
+	params := &dto.ServiceDeleteInput{}
+	err := params.BindValidParam(c)
+	if err != nil {
+		middleware.ResponseError(c, 2000, err)
+		return
+	}
+
+	tx, err := lib.GetGormPool("default")
+	if err != nil {
+		middleware.ResponseError(c, 2001, err)
+		return
+	}
+
+	// 读取基本信息
+	serviceInfo := &dao.ServiceInfo{ID: params.ID}
+	serviceInfo, err = serviceInfo.Find(c, tx, serviceInfo)
+	if err != nil {
+		middleware.ResponseError(c, 2002, err)
+		return
+	}
+	serviceInfo.IsDelete = 1
+	err = serviceInfo.Save(c, tx)
+	if err != nil {
+		middleware.ResponseError(c, 2003, err)
+		return
+	}
+	middleware.ResponseSuccess(c, "删除成功")
 }
