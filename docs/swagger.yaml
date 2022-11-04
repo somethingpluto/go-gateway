@@ -16,6 +16,119 @@ definitions:
       token:
         type: string
     type: object
+  dto.ServiceAddHTTPInput:
+    properties:
+      black_list:
+        description: 黑名单ip
+        example: ""
+        type: string
+      clientip_flow_limit:
+        description: "\b客户端ip限流"
+        example: 0
+        minimum: 0
+        type: integer
+      header_transfor:
+        description: header转换
+        example: ""
+        type: string
+      ip_list:
+        description: ip列表
+        example: "0"
+        type: string
+      need_https:
+        description: 支持https
+        example: 0
+        maximum: 1
+        minimum: 0
+        type: integer
+      need_strip_uri:
+        description: 启用strip_uri
+        example: 0
+        maximum: 1
+        minimum: 0
+        type: integer
+      need_websocket:
+        description: 是否支持websocket
+        example: 0
+        maximum: 1
+        minimum: 0
+        type: integer
+      open_auth:
+        description: 关键词
+        example: 0
+        maximum: 1
+        minimum: 0
+        type: integer
+      round_type:
+        description: 轮询方式
+        example: 0
+        maximum: 3
+        minimum: 0
+        type: integer
+      rule:
+        description: 域名或者前缀
+        example: ""
+        type: string
+      rule_type:
+        description: 接入类型
+        example: 0
+        maximum: 1
+        minimum: 0
+        type: integer
+      service_desc:
+        description: 服务描述
+        example: ""
+        maxLength: 255
+        minLength: 1
+        type: string
+      service_flow_limit:
+        description: 服务端限流
+        example: 0
+        minimum: 0
+        type: integer
+      service_name:
+        description: 服务名
+        example: ""
+        type: string
+      upstream_connect_timeout:
+        description: 建立连接超时, 单位s
+        example: 0
+        minimum: 0
+        type: integer
+      upstream_header_timeout:
+        description: 获取header超时, 单位s
+        example: 0
+        minimum: 0
+        type: integer
+      upstream_idle_timeout:
+        description: 链接最大空闲时间, 单位s
+        example: 0
+        minimum: 0
+        type: integer
+      upstream_max_idle:
+        description: 最大空闲链接数
+        example: 10
+        minimum: 0
+        type: integer
+      url_rewrite:
+        description: url重写功能
+        example: ""
+        type: string
+      weight_list:
+        description: "\b权重列表"
+        example: ""
+        type: string
+      white_list:
+        description: 白名单ip
+        example: ""
+        type: string
+    required:
+    - ip_list
+    - rule
+    - service_desc
+    - service_name
+    - weight_list
+    type: object
   middleware.Response:
     properties:
       data: {}
@@ -57,4 +170,32 @@ paths:
       summary: 管理员登陆
       tags:
       - 管理员接口
+  /service/service_add_http:
+    post:
+      consumes:
+      - application/json
+      description: 添加HTTP服务
+      operationId: /service/service_add_http
+      parameters:
+      - description: body
+        in: body
+        name: body
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ServiceAddHTTPInput'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: success
+          schema:
+            allOf:
+            - $ref: '#/definitions/middleware.Response'
+            - properties:
+                data:
+                  type: string
+              type: object
+      summary: 添加HTTP服务
+      tags:
+      - 服务管理
 swagger: "2.0"

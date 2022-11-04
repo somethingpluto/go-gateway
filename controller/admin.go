@@ -14,10 +14,6 @@ import (
 
 type AdminController struct{}
 
-// AdminRegister
-// @Description: 注册Admin接口
-// @param group
-//
 func AdminRegister(group *gin.RouterGroup) {
 	admin := AdminController{}
 	group.GET("/admin_info", admin.AdminInfo)

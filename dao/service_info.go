@@ -88,15 +88,6 @@ func (t *ServiceInfo) PageList(c *gin.Context, tx *gorm.DB, param *dto.ServiceLi
 	return list, total, nil
 }
 
-// Find
-// @Description: 服务信息条件查询
-// @receiver t
-// @param c
-// @param tx
-// @param search
-// @return *ServiceInfo
-// @return error
-//
 func (t *ServiceInfo) Find(c *gin.Context, tx *gorm.DB, search *ServiceInfo) (*ServiceInfo, error) {
 	out := &ServiceInfo{}
 	err := tx.SetCtx(public.GetGinTraceContext(c)).Where(search).Find(out).Error

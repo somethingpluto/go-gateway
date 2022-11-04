@@ -25,15 +25,6 @@ func (t *AccessControl) TableName() string {
 	return "gateway_service_access_control"
 }
 
-// Find
-// @Description: 根据条件查找Access
-// @receiver t
-// @param c
-// @param tx
-// @param search
-// @return *AccessControl
-// @return error
-//
 func (t *AccessControl) Find(c *gin.Context, tx *gorm.DB, search *AccessControl) (*AccessControl, error) {
 	model := &AccessControl{}
 	err := tx.SetCtx(public.GetGinTraceContext(c)).Where(search).Find(&model).Error

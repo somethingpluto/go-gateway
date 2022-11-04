@@ -1,12 +1,14 @@
 package controller
 
 import (
+	"errors"
 	"fmt"
 	"go_gateway/common/lib"
 	"go_gateway/dao"
 	"go_gateway/dto"
 	"go_gateway/middleware"
 	"go_gateway/public"
+	"strings"
 
 	"github.com/gin-gonic/gin"
 )
@@ -17,6 +19,8 @@ func ServiceRegister(group *gin.RouterGroup) {
 	service := &ServiceController{}
 	group.GET("/service_list", service.ServiceList)
 	group.POST("/service_delete", service.ServiceDelete)
+
+	group.POST("/service_add_http", service.ServiceAddHTTP)
 }
 
 func (service *ServiceController) ServiceList(c *gin.Context) {
@@ -114,4 +118,49 @@ func (service *ServiceController) ServiceDelete(c *gin.Context) {
 		return
 	}
 	middleware.ResponseSuccess(c, "删除成功")
+}
+
+// ServiceAddHTTP godoc
+// @Summary 添加HTTP服务
+// @Description 添加HTTP服务
+// @Tags 服务管理
+// @ID /service/service_add_http
+// @Accept  json
+// @Produce  json
+// @Param body body dto.ServiceAddHTTPInput true "body"
+// @Success 200 {object} middleware.Response{data=string} "success"
+// @Router /service/service_add_http [post]
+func (service *ServiceController) ServiceAddHTTP(c *gin.Context) {
+	params := &dto.ServiceAddHTTPInput{}
+	err := params.BindValidParam(c)
+	if err != nil {
+		middleware.ResponseError(c, 2000, err)
+		return
+	}
+	tx, err := lib.GetGormPool("default")
+	if err != nil {
+		middleware.ResponseError(c, 2001, err)
+		return
+	}
+
+	serviceInfo := &dao.ServiceInfo{ServiceName: params.ServiceName}
+	// 查找同名服务是否存在
+	serviceInfo, err = serviceInfo.Find(c, tx, serviceInfo)
+	if err == nil {
+		middleware.ResponseError(c, 2002, errors.New("服务已存在"))
+		return
+	}
+
+	httpRule := &dao.HttpRule{RuleType: params.RuleType, Rule: params.Rule}
+	httpRule, err = httpRule.Find(c, tx, httpRule)
+	if err == nil {
+		middleware.ResponseError(c, 2003, errors.New("接入前缀或域名规则已存在"))
+		return
+	}
+
+	if len(strings.Split(params.IpList, "\n")) != len(strings.Split(params.WhiteList, "\n")) {
+		middleware.ResponseError(c, 2003, errors.New("ipList数量与权重列表数量不相同"))
+		return
+	}
+	middleware.ResponseSuccess(c, "添加成功")
 }

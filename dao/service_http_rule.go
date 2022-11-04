@@ -30,3 +30,8 @@ func (t *HttpRule) Find(c *gin.Context, tx *gorm.DB, search *HttpRule) (*HttpRul
 	err := tx.SetCtx(public.GetGinTraceContext(c)).Where(search).Find(&model).Error
 	return model, err
 }
+
+func (t *HttpRule) Save(c *gin.Context, tx *gorm.DB) error {
+	err := tx.SetCtx(public.GetTraceContext(c)).Save(t).Error
+	return err
+}
