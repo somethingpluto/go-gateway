@@ -53,17 +53,21 @@ func TranslationMiddleware() gin.HandlerFunc {
 
 			// 验证服务名称
 			val.RegisterValidation("valid_service_name", func(fl validator.FieldLevel) bool {
-				matched, _ := regexp.Match(`[a-zA-Z0-9]`, []byte(fl.Field().String()))
+				matched, _ := regexp.Match(`^[a-zA-Z0-9]{6,128}$`, []byte(fl.Field().String()))
 				return matched
 			})
 
 			// 规则 非空
 			val.RegisterValidation("valid_rule", func(fl validator.FieldLevel) bool {
-				matched, _ := regexp.Match(`\S+`, []byte(fl.Field().String()))
+				matched, _ := regexp.Match(`^\S+$`, []byte(fl.Field().String()))
 				return matched
 			})
 
 			val.RegisterValidation("valid_url_rewrite", func(fl validator.FieldLevel) bool {
+
+				if fl.Field().String() == "" {
+					return true
+				}
 				for _, ms := range strings.Split(fl.Field().String(), "\n") {
 					if len(strings.Split(ms, "")) != 2 {
 						return false
@@ -72,22 +76,18 @@ func TranslationMiddleware() gin.HandlerFunc {
 				return true
 			})
 
+			//TODO:header_transfor验证规则
 			val.RegisterValidation("valid_header_transfor", func(fl validator.FieldLevel) bool {
-				for _, ms := range strings.Split(fl.Field().String(), "\n") {
-					if len(strings.Split(ms, "")) != 3 {
-						return false
-					}
-				}
+				//for _, ms := range strings.Split(fl.Field().String(), "\n") {
+				//	if len(strings.Split(ms, " ")) != 3 {
+				//		return false
+				//	}
+				//}
 				return true
 			})
 
+			//TODO:IPList验证规则
 			val.RegisterValidation("valid_iplist", func(fl validator.FieldLevel) bool {
-				for _, ms := range strings.Split(fl.Field().String(), "\n") {
-					match, _ := regexp.Match(`^((25[0-5]|2[0-4]\\d|[1]{1}\\d{1}\\d{1}|[1-9]{1}\\d{1}|\\d{1})($|(?!\\.$)\\.)){4}$`, []byte(ms))
-					if !match {
-						return false
-					}
-				}
 				return true
 			})
 
