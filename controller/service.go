@@ -18,8 +18,16 @@ func ServiceRegister(group *gin.RouterGroup) {
 	service := &ServiceController{}
 	group.GET("/service_list", service.ServiceList)
 	group.POST("/service_delete", service.ServiceDelete)
+	// 添加更新http
 	group.POST("/service_add_http", service.ServiceAddHTTP)
 	group.POST("/service_update_http", service.ServiceUpdateHTTP)
+
+	// 添加更新tcp
+	group.POST("/service_add_tcp", service.ServiceAddTCP)
+
+	// 添加grpc
+	group.POST("/service_add_grpc", service.ServiceAddGRPC)
+
 }
 
 // ServiceList godoc
@@ -437,9 +445,9 @@ func (service *ServiceController) ServiceAddTCP(c *gin.Context) {
 }
 
 // TODO:Update未完成
-func (service ServiceController) ServiceUpdateTCP(c *gin.Context) {
+func (service *ServiceController) ServiceUpdateTCP(c *gin.Context) {
 	params := &dto.ServiceUpdateTcpInput{}
-	err := params.BindValidParam()
+	err := params.BindValidParam(c)
 	if err != nil {
 		middleware.ResponseError(c, 2000, err)
 		return
@@ -449,6 +457,7 @@ func (service ServiceController) ServiceUpdateTCP(c *gin.Context) {
 		middleware.ResponseError(c, 2001, err)
 		return
 	}
+
 	// 查找服务是否存在
 	serviceInfo := &dao.ServiceInfo{ServiceName: params.ServiceName}
 	_, err = serviceInfo.Find(c, tx, serviceInfo)
@@ -456,4 +465,108 @@ func (service ServiceController) ServiceUpdateTCP(c *gin.Context) {
 		middleware.ResponseError(c, 2002, errors.New("服务不存在"))
 		return
 	}
+}
+
+func (service *ServiceController) ServiceAddGRPC(c *gin.Context) {
+	out := &dao.ServiceDetail{}
+	params := &dto.ServiceAddGrpcInput{}
+	err := params.BindValidParam(c)
+	if err != nil {
+		middleware.ResponseError(c, 2000, err)
+		return
+	}
+
+	tx, err := lib.GetGormPool("default")
+	if err != nil {
+		middleware.ResponseError(c, 2001, err)
+		return
+	}
+
+	// 验证serviceName是否被占用
+	serviceInfo := &dao.ServiceInfo{ServiceName: params.ServiceName, IsDelete: 0}
+	_, err = serviceInfo.Find(c, tx, serviceInfo)
+	if err == nil {
+		middleware.ResponseError(c, 2002, errors.New("服务名被占用"))
+		return
+	}
+
+	// 验证端口是否被占用
+	tcpRule := &dao.TcpRule{Port: params.Port}
+	_, err = tcpRule.Find(c, tx, tcpRule)
+	if err == nil {
+		middleware.ResponseError(c, 2003, errors.New("服务端被占用"))
+		return
+	}
+
+	grpcRule := &dao.GrpcRule{
+		Port: params.Port,
+	}
+	_, err = grpcRule.Find(c, tx, grpcRule)
+	if err == nil {
+		middleware.ResponseError(c, 2003, errors.New("服务端被占用"))
+		return
+	}
+	if len(strings.Split(params.IpList, ",")) != len(strings.Split(params.WeightList, ",")) {
+		middleware.ResponseError(c, 2005, errors.New("ip列表与权重设置不匹配"))
+		return
+	}
+	tx = tx.Begin()
+	serviceInfo = &dao.ServiceInfo{
+		LoadType:    public.LoadTypeGRPC,
+		ServiceName: params.ServiceName,
+		ServiceDesc: params.ServiceDesc,
+	}
+	err = serviceInfo.Save(c, tx)
+	if err != nil {
+		tx.Rollback()
+		middleware.ResponseError(c, 2006, err)
+		return
+	}
+	out.Info = serviceInfo
+
+	loadBalance := &dao.LoadBalance{
+		ServiceID:  serviceInfo.ID,
+		RoundType:  params.RoundType,
+		IpList:     params.IpList,
+		WeightList: params.WeightList,
+		ForbidList: params.ForbidList,
+	}
+	err = loadBalance.Save(c, tx)
+	if err != nil {
+		tx.Rollback()
+		middleware.ResponseError(c, 2007, err)
+		return
+	}
+	out.LoadBalance = loadBalance
+
+	grpcRule = &dao.GrpcRule{
+		ServiceID:      serviceInfo.ID,
+		Port:           params.Port,
+		HeaderTransfor: params.HeaderTransfor,
+	}
+	err = grpcRule.Save(c, tx)
+	if err != nil {
+		tx.Rollback()
+		middleware.ResponseError(c, 2008, err)
+		return
+	}
+	out.GRPCRule = grpcRule
+	// accessControl
+	accessControl := &dao.AccessControl{
+		ServiceID:         serviceInfo.ID,
+		OpenAuth:          params.OpenAuth,
+		BlackList:         params.BlackList,
+		WhiteList:         params.WhiteList,
+		WhiteHostName:     params.WhiteHostName,
+		ClientIPFlowLimit: params.ClientIPFlowLimit,
+		ServiceFlowLimit:  params.ServiceFlowLimit,
+	}
+	if err := accessControl.Save(c, tx); err != nil {
+		tx.Rollback()
+		middleware.ResponseError(c, 2009, err)
+		return
+	}
+	out.AccessControl = accessControl
+	tx.Commit()
+	middleware.ResponseSuccess(c, out)
 }

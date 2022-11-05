@@ -23,3 +23,7 @@ func (t *GrpcRule) Find(c *gin.Context, tx *gorm.DB, search *GrpcRule) (*GrpcRul
 	err := tx.SetCtx(public.GetGinTraceContext(c)).Where(search).Find(&model).Error
 	return model, err
 }
+
+func (t *GrpcRule) Save(c *gin.Context, tx *gorm.DB) error {
+	return tx.SetCtx(public.GetTraceContext(c)).Save(t).Error
+}
