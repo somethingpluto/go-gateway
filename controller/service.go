@@ -435,3 +435,25 @@ func (service *ServiceController) ServiceAddTCP(c *gin.Context) {
 	tx.Commit()
 	middleware.ResponseSuccess(c, out)
 }
+
+// TODO:Update未完成
+func (service ServiceController) ServiceUpdateTCP(c *gin.Context) {
+	params := &dto.ServiceUpdateTcpInput{}
+	err := params.BindValidParam()
+	if err != nil {
+		middleware.ResponseError(c, 2000, err)
+		return
+	}
+	tx, err := lib.GetGormPool("default")
+	if err != nil {
+		middleware.ResponseError(c, 2001, err)
+		return
+	}
+	// 查找服务是否存在
+	serviceInfo := &dao.ServiceInfo{ServiceName: params.ServiceName}
+	_, err = serviceInfo.Find(c, tx, serviceInfo)
+	if err != nil {
+		middleware.ResponseError(c, 2002, errors.New("服务不存在"))
+		return
+	}
+}
