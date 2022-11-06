@@ -14,18 +14,19 @@ import (
 	"strings"
 )
 
+var val *validator.Validate
+
 //设置Translation
 func TranslationMiddleware() gin.HandlerFunc {
 	return func(c *gin.Context) {
 		//参照：https://github.com/go-playground/validator/blob/v9/_examples/translations/main.go
-
 		//设置支持语言
 		en := en.New()
 		zh := zh.New()
 
 		//设置国际化翻译器
 		uni := ut.New(zh, zh, en)
-		val := validator.New()
+		val = validator.New()
 
 		//根据参数取翻译器实例
 		locale := c.DefaultQuery("locale", "zh")
@@ -47,34 +48,15 @@ func TranslationMiddleware() gin.HandlerFunc {
 
 			//自定义验证方法
 			//https://github.com/go-playground/validator/blob/v9/_examples/custom-validation/main.go
-			val.RegisterValidation("valid_username", func(fl validator.FieldLevel) bool {
-				return fl.Field().String() == "admin"
-			})
+			val.RegisterValidation("valid_username", validUsername)
 
 			// 验证服务名称
-			val.RegisterValidation("valid_service_name", func(fl validator.FieldLevel) bool {
-				matched, _ := regexp.Match(`^[a-zA-Z0-9]{6,128}$`, []byte(fl.Field().String()))
-				return matched
-			})
+			val.RegisterValidation("valid_service_name", validServiceName)
 
 			// 规则 非空
-			val.RegisterValidation("valid_rule", func(fl validator.FieldLevel) bool {
-				matched, _ := regexp.Match(`^\S+$`, []byte(fl.Field().String()))
-				return matched
-			})
+			val.RegisterValidation("valid_rule", validRule)
 
-			val.RegisterValidation("valid_url_rewrite", func(fl validator.FieldLevel) bool {
-
-				if fl.Field().String() == "" {
-					return true
-				}
-				for _, ms := range strings.Split(fl.Field().String(), "\n") {
-					if len(strings.Split(ms, "")) != 2 {
-						return false
-					}
-				}
-				return true
-			})
+			val.RegisterValidation("valid_url_rewrite", validUrlRewrite)
 
 			//TODO:header_transfor验证规则
 			val.RegisterValidation("valid_header_transfor", func(fl validator.FieldLevel) bool {
@@ -104,14 +86,14 @@ func TranslationMiddleware() gin.HandlerFunc {
 			//自定义验证器
 			//https://github.com/go-playground/validator/blob/v9/_examples/translations/main.go
 			val.RegisterTranslation("valid_username", trans, func(ut ut.Translator) error {
-				return ut.Add("valid_username", "{0} 填写不正确哦", true)
+				return ut.Add("valid_username", "用户名不能为空", true)
 			}, func(ut ut.Translator, fe validator.FieldError) string {
 				t, _ := ut.T("valid_username", fe.Field())
 				return t
 			})
 
 			val.RegisterTranslation("valid_service_name", trans, func(ut ut.Translator) error {
-				return ut.Add("valid_service_name", "{0} 服务名称不符合规则 ", true)
+				return ut.Add("valid_service_name", "服务名不能为空 ", true)
 			}, func(ut ut.Translator, fe validator.FieldError) string {
 				t, _ := ut.T("valid_service_name", fe.Field())
 				return t
@@ -160,4 +142,36 @@ func TranslationMiddleware() gin.HandlerFunc {
 		c.Set(public.ValidatorKey, val)
 		c.Next()
 	}
+}
+
+// 用户名规则验证
+func validUsername(fl validator.FieldLevel) bool {
+	// 用户名不能为空
+	match, _ := regexp.Match(`^[\s\S]*.*[^\s][\s\S]*$`, []byte(fl.Field().String()))
+	return match
+}
+
+// 服务名称验证
+func validServiceName(fl validator.FieldLevel) bool {
+	if fl.Field().String() == "" {
+		return false
+	}
+	return true
+}
+
+// 验证输入规则不能为空
+func validRule(fl validator.FieldLevel) bool {
+	if fl.Field().String() == "" {
+		return false
+	}
+	return true
+}
+
+// 验证路由重写
+func validUrlRewrite(fl validator.FieldLevel) bool {
+	if fl.Field().String() == "" {
+		return true
+	}
+
+	return true
 }
