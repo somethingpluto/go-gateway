@@ -1,12 +1,10 @@
-package controller
+package admin
 
 import (
 	"encoding/json"
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"go_gateway/common/lib"
-	"go_gateway/dao"
-	"go_gateway/dto"
 	"go_gateway/middleware"
 	"go_gateway/public"
 	"time"
@@ -32,7 +30,7 @@ func AdminLoginRegister(group *gin.RouterGroup) {
 // @Router /admin_login/login [post]
 func (adminLogin *AdminLoginController) AdminLogin(c *gin.Context) {
 	// 获取用户输入
-	param := &dto.AdminLoginInput{}
+	param := &admin.AdminLoginInput{}
 	// 用户输入验证
 	err := param.BindValidParam(c)
 	if err != nil {
@@ -50,7 +48,7 @@ func (adminLogin *AdminLoginController) AdminLogin(c *gin.Context) {
 		return
 	}
 
-	admin := &dao.Admin{}
+	admin := &admin.Admin{}
 	// 检查用户密码是否正确
 	admin, err = admin.LoginCheck(c, tx, param)
 	if err != nil {
@@ -59,7 +57,7 @@ func (adminLogin *AdminLoginController) AdminLogin(c *gin.Context) {
 	}
 	// 设置session
 
-	sessionInfo := &dto.AdminSessionInfo{
+	sessionInfo := &admin.AdminSessionInfo{
 		ID:        admin.Id,
 		UserName:  admin.UserName,
 		LoginTime: time.Now(),
@@ -72,7 +70,7 @@ func (adminLogin *AdminLoginController) AdminLogin(c *gin.Context) {
 	session := sessions.Default(c)
 	session.Set(public.AdminSessionInfoKey, string(sessionInfoBytes))
 	session.Save()
-	out := &dto.AdminLoginOutput{Token: admin.UserName}
+	out := &admin.AdminLoginOutput{Token: admin.UserName}
 	middleware.ResponseSuccess(c, out)
 }
 
