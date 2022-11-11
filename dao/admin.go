@@ -3,7 +3,7 @@ package dao
 import (
 	"errors"
 	"github.com/e421083458/gorm"
-
+	"go_gateway/dto"
 	"go_gateway/public"
 	"time"
 
@@ -24,7 +24,7 @@ func (admin *Admin) TableName() string {
 	return "gateway_admin"
 }
 
-func (admin *Admin) LoginCheck(c *gin.Context, tx *gorm.DB, param *admin.AdminLoginInput) (*Admin, error) {
+func (admin *Admin) LoginCheck(c *gin.Context, tx *gorm.DB, param *dto.AdminLoginInput) (*Admin, error) {
 	adminInfo, err := admin.Find(c, tx, &Admin{UserName: param.UserName, IsDelete: 0})
 	if err != nil {
 		return nil, errors.New("用户信息不存在")

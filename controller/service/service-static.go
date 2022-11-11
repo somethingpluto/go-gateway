@@ -3,7 +3,7 @@ package service
 import (
 	"github.com/gin-gonic/gin"
 	"go_gateway/common/lib"
-	"go_gateway/dto/service"
+	"go_gateway/dto"
 	"go_gateway/middleware"
 	"time"
 )

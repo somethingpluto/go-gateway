@@ -3,7 +3,7 @@ package dao
 import (
 	"github.com/e421083458/gorm"
 	"github.com/gin-gonic/gin"
-	dto "go_gateway/dto/service"
+	"go_gateway/dto"
 	"go_gateway/public"
 	"time"
 )

@@ -74,5 +74,6 @@ func InitRouter(middlewares ...gin.HandlerFunc) *gin.Engine {
 	InitAdminLoginRouter(router)
 	InitAdminRouter(router)
 	InitServiceRouter(router)
+	InitDashboardRouter(router)
 	return router
 }

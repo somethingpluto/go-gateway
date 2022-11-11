@@ -6,7 +6,7 @@ import (
 	"github.com/gin-gonic/contrib/sessions"
 	"github.com/gin-gonic/gin"
 	"go_gateway/common/lib"
-	dao "go_gateway/dao/admin"
+	"go_gateway/dao"
 	"go_gateway/middleware"
 	"go_gateway/public"
 )
