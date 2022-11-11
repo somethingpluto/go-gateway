@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"go_gateway/common/lib"
+	"go_gateway/dao"
 	"go_gateway/dto"
 	"go_gateway/middleware"
 	"strings"
@@ -21,7 +22,7 @@ import (
 // @Router /service/service_add_http [post]
 func (service *ServiceController) ServiceAddHTTP(c *gin.Context) {
 
-	out := &service.ServiceDetail{}
+	out := &dao.ServiceDetail{}
 	params := &dto.ServiceAddHTTPInput{}
 	err := params.BindValidParam(c)
 	if err != nil {
@@ -42,7 +43,7 @@ func (service *ServiceController) ServiceAddHTTP(c *gin.Context) {
 	tx = tx.Begin()
 
 	// 查找同名服务是否存在
-	serviceInfo := &service.ServiceInfo{ServiceName: params.ServiceName}
+	serviceInfo := &dao.ServiceInfo{ServiceName: params.ServiceName}
 	serviceInfo, err = serviceInfo.Find(c, tx, serviceInfo)
 	if err == nil { // 存在
 		tx.Rollback()
@@ -51,7 +52,7 @@ func (service *ServiceController) ServiceAddHTTP(c *gin.Context) {
 	}
 
 	// 查找同样接入前缀是否存在
-	httpRule := &service.HttpRule{RuleType: params.RuleType, Rule: params.Rule}
+	httpRule := &dao.HttpRule{RuleType: params.RuleType, Rule: params.Rule}
 	httpRule, err = httpRule.Find(c, tx, httpRule)
 	if err == nil { // 存在
 		tx.Rollback()
@@ -61,7 +62,7 @@ func (service *ServiceController) ServiceAddHTTP(c *gin.Context) {
 	out.HTTPRule = httpRule
 
 	// serviceInfo保存
-	serviceInfoModel := &service.ServiceInfo{
+	serviceInfoModel := &dao.ServiceInfo{
 		ServiceName: params.ServiceName,
 		ServiceDesc: params.ServiceDesc,
 	}
@@ -74,7 +75,7 @@ func (service *ServiceController) ServiceAddHTTP(c *gin.Context) {
 	out.Info = serviceInfoModel
 
 	// httpRule保存
-	httpRuleModel := &service.HttpRule{
+	httpRuleModel := &dao.HttpRule{
 		ServiceID:      serviceInfoModel.ID,
 		RuleType:       params.RuleType,
 		Rule:           params.Rule,
@@ -107,7 +108,7 @@ func (service *ServiceController) ServiceAddHTTP(c *gin.Context) {
 // @Router /service/service_update_http [post]
 func (service *ServiceController) ServiceUpdateHTTP(c *gin.Context) {
 
-	out := &service.ServiceDetail{}
+	out := &dao.ServiceDetail{}
 	params := &dto.ServiceUpdateHTTPInput{}
 	err := params.BindValidParam(c)
 	if err != nil {
@@ -127,7 +128,7 @@ func (service *ServiceController) ServiceUpdateHTTP(c *gin.Context) {
 	tx = tx.Begin()
 
 	// 查找服务是否存在
-	serviceInfo := &service.ServiceInfo{ServiceName: params.ServiceName}
+	serviceInfo := &dao.ServiceInfo{ServiceName: params.ServiceName}
 	serviceInfo, err = serviceInfo.Find(c, tx, serviceInfo)
 	if err != nil { // 不存在
 		tx.Rollback()

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"go_gateway/common/lib"
+	"go_gateway/dao"
 	"go_gateway/dto"
 	"go_gateway/middleware"
 	"go_gateway/public"
@@ -54,7 +55,7 @@ func (service *ServiceController) ServiceList(c *gin.Context) {
 		middleware.ResponseError(c, 2001, err)
 		return
 	}
-	serviceInfo := &service.ServiceInfo{}
+	serviceInfo := &dao.ServiceInfo{}
 	list, total, err := serviceInfo.PageList(c, db, params)
 	if err != nil {
 		middleware.ResponseError(c, 2002, err)
@@ -120,7 +121,7 @@ func (service *ServiceController) ServiceList(c *gin.Context) {
 // @Success 200 {object} middleware.Response{data=string} "success"
 // @Router /service/service_delete [get]
 func (service *ServiceController) ServiceDelete(c *gin.Context) {
-	out := &service.ServiceDetail{}
+	out := &dao.ServiceDetail{}
 	params := &dto.ServiceDeleteInput{}
 	err := params.BindValidParam(c)
 	if err != nil {
@@ -135,7 +136,7 @@ func (service *ServiceController) ServiceDelete(c *gin.Context) {
 	}
 
 	// 读取基本信息
-	serviceInfo := &service.ServiceInfo{ID: params.ID}
+	serviceInfo := &dao.ServiceInfo{ID: params.ID}
 	serviceInfo, err = serviceInfo.Find(c, tx, serviceInfo)
 	if err != nil {
 		middleware.ResponseError(c, 2002, err)

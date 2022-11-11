@@ -7,6 +7,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"go_gateway/common/lib"
 	"go_gateway/dao"
+	"go_gateway/dto"
 	"go_gateway/middleware"
 	"go_gateway/public"
 )
@@ -23,13 +24,13 @@ func (admin *AdminController) AdminInfo(c *gin.Context) {
 	// 1.读取sessionKey对应的结构体
 	session := sessions.Default(c)
 	sessionInfo := session.Get(public.AdminSessionInfoKey)
-	adminSessionInfo := &admin.AdminSessionInfo{}
+	adminSessionInfo := &dto.AdminSessionInfo{}
 	err := json.Unmarshal([]byte(fmt.Sprintf("%s", sessionInfo)), adminSessionInfo)
 	if err != nil {
 		middleware.ResponseError(c, 2001, err)
 	}
 	// 2.取出数据封装输出结构体
-	out := &admin.AdminInfoOutput{
+	out := &dto.AdminInfoOutput{
 		ID:           adminSessionInfo.ID,
 		UserName:     adminSessionInfo.UserName,
 		LoginTime:    adminSessionInfo.LoginTime,
@@ -42,7 +43,7 @@ func (admin *AdminController) AdminInfo(c *gin.Context) {
 
 func (admin AdminController) ChangePassword(c *gin.Context) {
 	// 1.获取参数 修改后的密码
-	params := &admin.ChangePasswordInput{}
+	params := &dto.ChangePasswordInput{}
 	err := public.DefaultGetValidParams(c, params)
 	if err != nil {
 		middleware.ResponseError(c, 2000, err)
@@ -51,7 +52,7 @@ func (admin AdminController) ChangePassword(c *gin.Context) {
 	// 2. 通过session获得用户的信息
 	session := sessions.Default(c)
 	sessionInfo := session.Get(public.AdminSessionInfoKey)
-	adminSessionInfo := &admin.AdminSessionInfo{}
+	adminSessionInfo := &dto.AdminSessionInfo{}
 	err = json.Unmarshal([]byte(fmt.Sprintf("%s", sessionInfo)), adminSessionInfo)
 	if err != nil {
 		middleware.ResponseError(c, 2001, err)

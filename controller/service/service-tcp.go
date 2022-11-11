@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"go_gateway/common/lib"
+	"go_gateway/dao"
 	"go_gateway/dto"
 	"go_gateway/middleware"
 	"go_gateway/public"
@@ -21,7 +22,7 @@ import (
 // @Success 200 {object} middleware.Response{data=string} "success"
 // @Router /service/service_add_tcp [post]
 func (service *ServiceController) ServiceAddTCP(c *gin.Context) {
-	out := &service.ServiceDetail{}
+	out := &dao.ServiceDetail{}
 	params := &dto.ServiceAddTcpInput{}
 	err := params.BindValidParam(c)
 	if err != nil {
@@ -40,7 +41,7 @@ func (service *ServiceController) ServiceAddTCP(c *gin.Context) {
 	}
 
 	// 查询ServiceName是否被占用
-	serviceInfo := &service.ServiceInfo{ServiceName: params.ServiceName}
+	serviceInfo := &dao.ServiceInfo{ServiceName: params.ServiceName}
 	serviceInfo, err = serviceInfo.Find(c, tx, serviceInfo)
 	if err == nil { // 占用
 		middleware.ResponseError(c, 2002, errors.New("服务名已被占用"))
@@ -48,13 +49,13 @@ func (service *ServiceController) ServiceAddTCP(c *gin.Context) {
 	}
 
 	// 验证端口是否被占用
-	tcpRule := &service.TcpRule{Port: params.Port}
+	tcpRule := &dao.TcpRule{Port: params.Port}
 	_, err = tcpRule.Find(c, tx, tcpRule)
 	if err == nil {
 		middleware.ResponseError(c, 2003, errors.New("服务端口已被占用"))
 		return
 	}
-	grpcRule := &service.GrpcRule{Port: params.Port}
+	grpcRule := &dao.GrpcRule{Port: params.Port}
 	_, err = grpcRule.Find(c, tx, grpcRule)
 	if err == nil {
 		middleware.ResponseError(c, 2004, errors.New("服务端口已被占用"))
@@ -63,7 +64,7 @@ func (service *ServiceController) ServiceAddTCP(c *gin.Context) {
 
 	tx = tx.Begin()
 	// serviceInfo保存
-	serviceInfo = &service.ServiceInfo{
+	serviceInfo = &dao.ServiceInfo{
 		LoadType:    public.LoadTypeTCP,
 		ServiceName: params.ServiceName,
 		ServiceDesc: params.ServiceDesc,
@@ -77,7 +78,7 @@ func (service *ServiceController) ServiceAddTCP(c *gin.Context) {
 	out.Info = serviceInfo
 
 	// loadBalance保存
-	loadBalance := &service.LoadBalance{
+	loadBalance := &dao.LoadBalance{
 		ServiceID:  serviceInfo.ID,
 		RoundType:  params.RoundType,
 		IpList:     params.IpList,
@@ -93,7 +94,7 @@ func (service *ServiceController) ServiceAddTCP(c *gin.Context) {
 	out.LoadBalance = loadBalance
 
 	// tcp规则保存
-	tcpRule = &service.TcpRule{
+	tcpRule = &dao.TcpRule{
 		ServiceID: serviceInfo.ID,
 		Port:      params.Port,
 	}
@@ -106,7 +107,7 @@ func (service *ServiceController) ServiceAddTCP(c *gin.Context) {
 	out.TCPRule = tcpRule
 
 	// accessControl保存
-	accessControl := &service.AccessControl{
+	accessControl := &dao.AccessControl{
 		ServiceID:         serviceInfo.ID,
 		OpenAuth:          params.OpenAuth,
 		BlackList:         params.BlackList,
@@ -139,7 +140,7 @@ func (service *ServiceController) ServiceAddTCP(c *gin.Context) {
 // @Success 200 {object} middleware.Response{data=string} "success"
 // @Router /service/service_update_tcp [post]
 func (service *ServiceController) ServiceUpdateTCP(c *gin.Context) {
-	out := &service.ServiceDetail{}
+	out := &dao.ServiceDetail{}
 	params := &dto.ServiceUpdateTcpInput{}
 	if err := params.BindValidParam(c); err != nil {
 		middleware.ResponseError(c, 2001, err)
@@ -153,7 +154,7 @@ func (service *ServiceController) ServiceUpdateTCP(c *gin.Context) {
 	tx := lib.GORMDefaultPool.Begin()
 
 	// 获取服务详细信息
-	serviceInfo := &service.ServiceInfo{
+	serviceInfo := &dao.ServiceInfo{
 		ID: params.ID,
 	}
 	detail, err := serviceInfo.ServiceDetail(c, lib.GORMDefaultPool, serviceInfo)
@@ -171,7 +172,7 @@ func (service *ServiceController) ServiceUpdateTCP(c *gin.Context) {
 	out.Info = detail.Info
 
 	// 更行loadBalance
-	loadBalance := &service.LoadBalance{}
+	loadBalance := &dao.LoadBalance{}
 	if detail.LoadBalance != nil {
 		loadBalance = detail.LoadBalance
 	}
@@ -188,7 +189,7 @@ func (service *ServiceController) ServiceUpdateTCP(c *gin.Context) {
 	out.LoadBalance = loadBalance
 
 	// 更新tcp规则
-	tcpRule := &service.TcpRule{}
+	tcpRule := &dao.TcpRule{}
 	if detail.TCPRule != nil {
 		tcpRule = detail.TCPRule
 	}
@@ -202,7 +203,7 @@ func (service *ServiceController) ServiceUpdateTCP(c *gin.Context) {
 	out.TCPRule = tcpRule
 
 	// 更新accessControl
-	accessControl := &service.AccessControl{}
+	accessControl := &dao.AccessControl{}
 	if detail.AccessControl != nil {
 		accessControl = detail.AccessControl
 	}

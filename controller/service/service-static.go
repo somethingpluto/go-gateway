@@ -3,6 +3,7 @@ package service
 import (
 	"github.com/gin-gonic/gin"
 	"go_gateway/common/lib"
+	"go_gateway/dao"
 	"go_gateway/dto"
 	"go_gateway/middleware"
 	"time"
@@ -24,7 +25,7 @@ func (service *ServiceController) ServiceStatic(c *gin.Context) {
 	}
 
 	// 获取服务基本信息
-	serviceInfo := &service.ServiceInfo{ID: params.ID}
+	serviceInfo := &dao.ServiceInfo{ID: params.ID}
 	serviceInfo, err = serviceInfo.Find(c, tx, serviceInfo)
 	if err != nil {
 		middleware.ResponseError(c, 2002, err)

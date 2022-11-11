@@ -1,4 +1,40 @@
 definitions:
+  dto.APPListItemOutput:
+    properties:
+      app_id:
+        type: string
+      create_at:
+        type: string
+      id:
+        type: integer
+      is_delete:
+        type: integer
+      name:
+        type: string
+      qpd:
+        type: integer
+      qps:
+        type: integer
+      real_qpd:
+        type: integer
+      real_qps:
+        type: integer
+      secret:
+        type: string
+      update_at:
+        type: string
+      white_ips:
+        type: string
+    type: object
+  dto.APPListOutput:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/dto.APPListItemOutput'
+        type: array
+      total:
+        type: integer
+    type: object
   dto.AdminLoginInput:
     properties:
       password:
@@ -166,6 +202,7 @@ definitions:
     - rule
     - service_desc
     - service_name
+    - url_rewrite
     - weight_list
     type: object
   dto.ServiceAddTcpInput:
@@ -388,7 +425,6 @@ definitions:
         example: ""
         type: string
     required:
-    - id
     - ip_list
     - rule
     - service_desc

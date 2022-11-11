@@ -450,6 +450,61 @@ const docTemplate_swagger = `{
         }
     },
     "definitions": {
+        "dto.APPListItemOutput": {
+            "type": "object",
+            "properties": {
+                "app_id": {
+                    "type": "string"
+                },
+                "create_at": {
+                    "type": "string"
+                },
+                "id": {
+                    "type": "integer"
+                },
+                "is_delete": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                },
+                "qpd": {
+                    "type": "integer"
+                },
+                "qps": {
+                    "type": "integer"
+                },
+                "real_qpd": {
+                    "type": "integer"
+                },
+                "real_qps": {
+                    "type": "integer"
+                },
+                "secret": {
+                    "type": "string"
+                },
+                "update_at": {
+                    "type": "string"
+                },
+                "white_ips": {
+                    "type": "string"
+                }
+            }
+        },
+        "dto.APPListOutput": {
+            "type": "object",
+            "properties": {
+                "list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/dto.APPListItemOutput"
+                    }
+                },
+                "total": {
+                    "type": "integer"
+                }
+            }
+        },
         "dto.AdminLoginInput": {
             "type": "object",
             "required": [
@@ -538,6 +593,7 @@ const docTemplate_swagger = `{
                 "rule",
                 "service_desc",
                 "service_name",
+                "url_rewrite",
                 "weight_list"
             ],
             "properties": {
@@ -831,7 +887,6 @@ const docTemplate_swagger = `{
         "dto.ServiceUpdateHTTPInput": {
             "type": "object",
             "required": [
-                "id",
                 "ip_list",
                 "rule",
                 "service_desc",

@@ -4,6 +4,7 @@ import (
 	"errors"
 	"github.com/gin-gonic/gin"
 	"go_gateway/common/lib"
+	"go_gateway/dao"
 	"go_gateway/dto"
 	"go_gateway/middleware"
 	"go_gateway/public"
@@ -21,7 +22,7 @@ import (
 // @Success 200 {object} middleware.Response{data=string} "success"
 // @Router /service/service_add_grpc [post]
 func (service *ServiceController) ServiceAddGRPC(c *gin.Context) {
-	out := &service.ServiceDetail{}
+	out := &dao.ServiceDetail{}
 	params := &dto.ServiceAddGrpcInput{}
 	err := params.BindValidParam(c)
 	if err != nil {
@@ -39,7 +40,7 @@ func (service *ServiceController) ServiceAddGRPC(c *gin.Context) {
 	}
 
 	// 验证serviceName是否被占用
-	serviceInfo := &service.ServiceInfo{ServiceName: params.ServiceName}
+	serviceInfo := &dao.ServiceInfo{ServiceName: params.ServiceName}
 	_, err = serviceInfo.Find(c, tx, serviceInfo)
 	if err == nil {
 		middleware.ResponseError(c, 2002, errors.New("服务名被占用"))
@@ -47,13 +48,13 @@ func (service *ServiceController) ServiceAddGRPC(c *gin.Context) {
 	}
 
 	// 验证端口是否被占用
-	tcpRule := &service.TcpRule{Port: params.Port}
+	tcpRule := &dao.TcpRule{Port: params.Port}
 	_, err = tcpRule.Find(c, tx, tcpRule)
 	if err == nil {
 		middleware.ResponseError(c, 2003, errors.New("服务端被占用"))
 		return
 	}
-	grpcRule := &service.GrpcRule{
+	grpcRule := &dao.GrpcRule{
 		Port: params.Port,
 	}
 	_, err = grpcRule.Find(c, tx, grpcRule)
@@ -64,7 +65,7 @@ func (service *ServiceController) ServiceAddGRPC(c *gin.Context) {
 
 	// 添加serviceInfo信息
 	tx = tx.Begin()
-	serviceInfo = &service.ServiceInfo{
+	serviceInfo = &dao.ServiceInfo{
 		LoadType:    public.LoadTypeGRPC,
 		ServiceName: params.ServiceName,
 		ServiceDesc: params.ServiceDesc,
@@ -78,7 +79,7 @@ func (service *ServiceController) ServiceAddGRPC(c *gin.Context) {
 	out.Info = serviceInfo
 
 	// 添加loadBalance信息
-	loadBalance := &service.LoadBalance{
+	loadBalance := &dao.LoadBalance{
 		ServiceID:  serviceInfo.ID,
 		RoundType:  params.RoundType,
 		IpList:     params.IpList,
@@ -94,7 +95,7 @@ func (service *ServiceController) ServiceAddGRPC(c *gin.Context) {
 	out.LoadBalance = loadBalance
 
 	// 添加grpc规则
-	grpcRule = &service.GrpcRule{
+	grpcRule = &dao.GrpcRule{
 		ServiceID:      serviceInfo.ID,
 		Port:           params.Port,
 		HeaderTransfor: params.HeaderTransfor,
@@ -107,7 +108,7 @@ func (service *ServiceController) ServiceAddGRPC(c *gin.Context) {
 	}
 	out.GRPCRule = grpcRule
 	// accessControl
-	accessControl := &service.AccessControl{
+	accessControl := &dao.AccessControl{
 		ServiceID:         serviceInfo.ID,
 		OpenAuth:          params.OpenAuth,
 		BlackList:         params.BlackList,
@@ -138,7 +139,7 @@ func (service *ServiceController) ServiceAddGRPC(c *gin.Context) {
 // @Success 200 {object} middleware.Response{data=string} "success"
 // @Router /service/service_update_grpc [post]
 func (service *ServiceController) ServiceUpdateGRPC(c *gin.Context) {
-	out := &service.ServiceDetail{}
+	out := &dao.ServiceDetail{}
 	params := &dto.ServiceUpdateGrpcInput{}
 	if err := params.BindValidParam(c); err != nil {
 		middleware.ResponseError(c, 2001, err)
@@ -151,7 +152,7 @@ func (service *ServiceController) ServiceUpdateGRPC(c *gin.Context) {
 	}
 	tx := lib.GORMDefaultPool.Begin()
 
-	serviceInfo := &service.ServiceInfo{
+	serviceInfo := &dao.ServiceInfo{
 		ID: params.ID,
 	}
 	detail, err := serviceInfo.ServiceDetail(c, lib.GORMDefaultPool, serviceInfo)
@@ -168,7 +169,7 @@ func (service *ServiceController) ServiceUpdateGRPC(c *gin.Context) {
 	}
 	out.Info = info
 	// 负载均衡更新保存
-	loadBalance := &service.LoadBalance{}
+	loadBalance := &dao.LoadBalance{}
 	if detail.LoadBalance != nil {
 		loadBalance = detail.LoadBalance
 	}
@@ -185,7 +186,7 @@ func (service *ServiceController) ServiceUpdateGRPC(c *gin.Context) {
 	out.LoadBalance = loadBalance
 
 	// grpc规则保存
-	grpcRule := &service.GrpcRule{}
+	grpcRule := &dao.GrpcRule{}
 	if detail.GRPCRule != nil {
 		grpcRule = detail.GRPCRule
 	}
@@ -200,7 +201,7 @@ func (service *ServiceController) ServiceUpdateGRPC(c *gin.Context) {
 	out.GRPCRule = grpcRule
 
 	// accessControl更新保存
-	accessControl := &service.AccessControl{}
+	accessControl := &dao.AccessControl{}
 	if detail.AccessControl != nil {
 		accessControl = detail.AccessControl
 	}
