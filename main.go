@@ -1,6 +1,7 @@
 package main
 
 import (
+	"flag"
 	"go_gateway/common/lib"
 	"go_gateway/initialize"
 	"go_gateway/router"
@@ -9,15 +10,36 @@ import (
 	"syscall"
 )
 
+var (
+	endpoint = flag.String("endpoint", "dashboard", "input endpoint dashboard or server")
+	config   = flag.String("config", "./conf/dev/", "input config file like ./conf/dev/")
+)
+
 func main() {
-	_ = lib.InitModule("./conf/dev/")
-	defer lib.Destroy()
-	initialize.Init()
-	router.HttpServerRun()
+	flag.Parse()
 
-	quit := make(chan os.Signal)
-	signal.Notify(quit, syscall.SIGKILL, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGTERM)
-	<-quit
+	if *endpoint == "" {
+		flag.Usage()
+		os.Exit(1)
+	}
+	if *config == "" {
+		flag.Usage()
+		os.Exit(1)
+	}
+	if *endpoint == "dashboard" {
+		err := lib.InitModule("./conf/dev/")
+		if err != nil {
+			panic(err)
+		}
+		defer lib.Destroy()
+		initialize.Init()
+		router.HttpServerRun()
 
-	router.HttpServerStop()
+		quit := make(chan os.Signal)
+		signal.Notify(quit, syscall.SIGKILL, syscall.SIGQUIT, syscall.SIGINT, syscall.SIGTERM)
+		<-quit
+
+		router.HttpServerStop()
+	}
+
 }
