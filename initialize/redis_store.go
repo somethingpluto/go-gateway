@@ -11,5 +11,9 @@ func InitRedisStore() {
 	if err != nil {
 		log.Fatalln(err)
 	}
+	store.Options(sessions.Options{
+		MaxAge: int(30 * 60),
+		Path:   "/",
+	})
 	global.SessionRedisStore = store
 }
