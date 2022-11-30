@@ -81,7 +81,8 @@ func (t *ServiceInfo) PageList(c *gin.Context, tx *gorm.DB, param *dto.ServiceLi
 	if param.Info != "" {
 		query = query.Where("(service_name like ? or service_desc like ?)", "%"+param.Info+"%", "%"+param.Info+"%")
 	}
-	err := query.Limit(param.PageSize).Offset(offset).Order("id desc").Find(&list).Count(&total).Error
+	err := query.Limit(param.PageSize).Offset(offset).Order("id desc").Find(&list).Error
+	query.Count(&total)
 	if err != gorm.ErrRecordNotFound && err != nil {
 		return nil, 0, err
 	}

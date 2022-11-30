@@ -50,11 +50,13 @@ func (service *ServiceController) ServiceList(c *gin.Context) {
 		middleware.ResponseError(c, 2000, err)
 		return
 	}
+	// 获取数据库连接
 	db, err := lib.GetGormPool("default")
 	if err != nil {
 		middleware.ResponseError(c, 2001, err)
 		return
 	}
+	// 获取PageList
 	serviceInfo := &dao.ServiceInfo{}
 	list, total, err := serviceInfo.PageList(c, db, params)
 	if err != nil {
@@ -121,7 +123,6 @@ func (service *ServiceController) ServiceList(c *gin.Context) {
 // @Success 200 {object} middleware.Response{data=string} "success"
 // @Router /service/service_delete [get]
 func (service *ServiceController) ServiceDelete(c *gin.Context) {
-	out := &dao.ServiceDetail{}
 	params := &dto.ServiceDeleteInput{}
 	err := params.BindValidParam(c)
 	if err != nil {
@@ -148,6 +149,5 @@ func (service *ServiceController) ServiceDelete(c *gin.Context) {
 		middleware.ResponseError(c, 2003, err)
 		return
 	}
-	out.Info.ID = serviceInfo.ID
-	middleware.ResponseSuccess(c, out)
+	middleware.ResponseSuccess(c, "")
 }
