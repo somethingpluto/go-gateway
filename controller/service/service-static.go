@@ -38,6 +38,9 @@ func (service *ServiceController) ServiceStatic(c *gin.Context) {
 		middleware.ResponseError(c, 2003, err)
 		return
 	}
+
+	out.Title = serviceInfo.ServiceName
+
 	todayList := []int{}
 	for i := 0; i <= time.Now().Hour(); i++ {
 		todayList = append(todayList, 0)

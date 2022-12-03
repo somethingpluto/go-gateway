@@ -12,7 +12,8 @@ type DashboardController struct {
 }
 
 func ServiceRegister(router *gin.RouterGroup) {
-
+	service := &DashboardController{}
+	router.GET("/panel_group_data", service.PanelGroupData)
 }
 
 func (service *DashboardController) PanelGroupData(c *gin.Context) {

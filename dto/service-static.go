@@ -10,8 +10,9 @@ type ServiceStaticInput struct {
 }
 
 type ServiceStaticOutput struct {
-	Today     []int `json:"today"`
-	Yesterday []int `json:"yesterday"`
+	Title     string `json:"title"`
+	Today     []int  `json:"today"`
+	Yesterday []int  `json:"yesterday"`
 }
 
 func (params *ServiceStaticInput) BindValidParam(c *gin.Context) error {
