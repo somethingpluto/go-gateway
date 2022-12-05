@@ -101,3 +101,13 @@ func (t *ServiceInfo) Find(c *gin.Context, tx *gorm.DB, search *ServiceInfo) (*S
 func (t *ServiceInfo) Save(c *gin.Context, tx *gorm.DB) error {
 	return tx.SetCtx(public.GetGinTraceContext(c)).Save(t).Error
 }
+
+func (t ServiceInfo) GroupByLoadType(c *gin.Context, tx *gorm.DB) ([]dto.DashServiceStatItemOutput, error) {
+	list := []dto.DashServiceStatItemOutput{}
+	query := tx.SetCtx(public.GetGinTraceContext(c))
+	err := query.Table(t.TableName()).Where("is_delete=0").Select("load_type, count(*) as value").Group("load_type").Scan(&list).Error
+	if err != nil {
+		return nil, err
+	}
+	return list, nil
+}
