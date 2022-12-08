@@ -15,6 +15,7 @@ import (
 )
 
 func InitDBPool(path string) error {
+
 	//普通的db方式
 	DbConfMap := &MysqlMapConf{}
 	err := ParseConfig(path, DbConfMap)

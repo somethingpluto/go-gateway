@@ -16,7 +16,7 @@ func ServiceRegister(router *gin.RouterGroup) {
 	app := &APPController{}
 	router.GET("/app_list", app.APPList)
 	router.GET("/app_detail", app.APPDetail)
-	router.GET("/app_delete", app.APPDelete)
+	router.DELETE("/app_delete", app.APPDelete)
 	router.POST("/app_add", app.APPAdd)
 }
 
@@ -50,7 +50,7 @@ func (service *APPController) APPList(c *gin.Context) {
 		middleware.ResponseError(c, 2003, err)
 		return
 	}
-	outPutList := []dto.APPListItemOutput{}
+	var outPutList []dto.APPListItemOutput
 	for _, item := range list {
 		outPutList = append(outPutList, dto.APPListItemOutput{
 			ID:       item.ID,

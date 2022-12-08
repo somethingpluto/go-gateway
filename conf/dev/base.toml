@@ -23,8 +23,8 @@
         wf_log_path = "./logs/go_gateway.wf.log"
         rotate_wf_log_path = "./logs/go_gateway.wf.log.%Y%M%D%H"
     [log.console_writer]        #工作台输出
-        on = false
-        color = false
+        on = true
+        color = true
 
 [swagger]
     title="go_gateway swagger API"
